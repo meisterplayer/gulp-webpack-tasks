@@ -1,6 +1,8 @@
 const webpack = require('webpack');
-const webpackConfig = require('./webpack.config');
+const webpackDevMiddleware = require('webpack-dev-middleware');
+const webpackHotMiddleware = require('webpack-dev-middleware');
 const merge = require('lodash.merge');
+const webpackConfig = require('./webpack.config');
 
 function createConfig(inPath, outPath, minify = false, webpackOptions = {}) {
     if (!inPath) {
@@ -25,16 +27,43 @@ function createConfig(inPath, outPath, minify = false, webpackOptions = {}) {
     return newWebpackConfig;
 }
 
-function createBuildTask(config) {
+function createCompiler(config) {
+    return webpack(config);
+}
+
+function createDevMiddleware(compiler, config) {
+    return webpackDevMiddleware(compiler, {
+        noInfo: true,
+        quiet: false,
+        publicPath: config.output.publicPath,
+    });
+}
+
+function createHotMiddleware(compiler, config) {
+    return webpackHotMiddleware(compiler);
+}
+
+function createBuildTask(compiler) {
     return function webpackBuild(done) {
-        webpack(config, (err, stats) => {
+        compiler.run((err, stats) => {
             if (err) throw new Error(err);
-            done(stats);
+            console.log(stats.toString());
+            done();
         });
     }
 }
 
+function createWatchTask(compiler, callback) {
+    compiler.watch({}, (err, stats) => {
+        callback(err, stats);
+    });
+}
+
 module.exports = {
     createBuildTask,
-    createConfig
+    createConfig,
+    createDevMiddleware,
+    createHotMiddleware,
+    createCompiler,
+    createWatchTask,
 };
