@@ -4,9 +4,9 @@ const webpackHotMiddleware = require('webpack-dev-middleware');
 const merge = require('lodash.merge');
 const webpackConfig = require('./webpack.config');
 
-function createConfig(inPath, outPath, minify = false, webpackOptions = {}) {
-    if (!inPath) {
-        throw new Error('Input path argument is required');
+function createConfig(entry, outPath, minify = false, webpackOptions = {}) {
+    if (!entry) {
+        throw new Error('Entry path argument is required');
     }
 
     if (!outPath) {
@@ -15,7 +15,7 @@ function createConfig(inPath, outPath, minify = false, webpackOptions = {}) {
 
     const newWebpackConfig = merge({}, webpackConfig, webpackOptions);
 
-    newWebpackConfig.entry[0] = inPath;
+    newWebpackConfig.entry = entry;
     newWebpackConfig.output.filename = outPath;
 
     newWebpackConfig.plugins = (minify ? [
