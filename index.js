@@ -4,19 +4,29 @@ const webpackHotMiddleware = require('webpack-dev-middleware');
 const merge = require('lodash.merge');
 const webpackConfig = require('./webpack.config');
 
-function createConfig(entry, outPath, minify = false, webpackOptions = {}) {
+function createOutputConfig(outputOptions) {
+    if (typeof config === 'string') {
+        return merge({}, webpackConfig.output, {
+            filename: outputOptions,
+        });
+    } else {
+        return merge({}, webpackConfig.output, outputOptions);
+    }
+}
+
+function createConfig(entry, output, minify = false, webpackOptions = {}) {
     if (!entry) {
         throw new Error('Entry path argument is required');
     }
 
-    if (!outPath) {
+    if (!output) {
         throw new Error('Output path argument is required');
     }
 
     const newWebpackConfig = merge({}, webpackConfig, webpackOptions);
 
     newWebpackConfig.entry = entry;
-    newWebpackConfig.output.filename = outPath;
+    newWebpackConfig.output = createOutputConfig(output);
 
     newWebpackConfig.plugins = (minify ? [
         new webpack.optimize.UglifyJsPlugin({
