@@ -5,7 +5,7 @@ const merge = require('lodash.merge');
 const webpackConfig = require('./webpack.config');
 
 function createOutputConfig(outputOptions) {
-    if (typeof config === 'string') {
+    if (typeof outputOptions === 'string') {
         return merge({}, webpackConfig.output, {
             filename: outputOptions,
         });
