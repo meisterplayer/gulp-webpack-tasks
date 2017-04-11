@@ -38,7 +38,7 @@ function createConfig(entry, output, minify = false, webpackOptions = {}) {
 }
 
 function configWithHot(config) {
-    config.entry.unshift('webpack-hot-middleware/client');
+    config.entry.unshift('webpack-hot-middleware/client?reload=true');
 
     config.plugins = config.plugins.concat(
         new webpack.optimize.OccurrenceOrderPlugin(),
