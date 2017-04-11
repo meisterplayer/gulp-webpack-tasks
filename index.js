@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
-const webpackHotMiddleware = require('webpack-dev-middleware');
+const webpackHotMiddleware = require('webpack-hot-middleware');
 const merge = require('lodash.merge');
 const webpackConfig = require('./webpack.config');
 
@@ -25,7 +25,7 @@ function createConfig(entry, output, minify = false, webpackOptions = {}) {
 
     const newWebpackConfig = merge({}, webpackConfig, webpackOptions);
 
-    newWebpackConfig.entry = entry;
+    newWebpackConfig.entry = typeof entry === 'string' ? [entry] : entry;
     newWebpackConfig.output = createOutputConfig(output);
 
     newWebpackConfig.plugins = (minify ? [
@@ -37,19 +37,30 @@ function createConfig(entry, output, minify = false, webpackOptions = {}) {
     return newWebpackConfig;
 }
 
+function configWithHot(config) {
+    config.entry.unshift('webpack-hot-middleware/client');
+
+    config.plugins = config.plugins.concat(
+        new webpack.optimize.OccurrenceOrderPlugin(),
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.NoEmitOnErrorsPlugin()
+    );
+
+    return config;
+}
+
 function createCompiler(config) {
     return webpack(config);
 }
 
 function createDevMiddleware(compiler, config) {
     return webpackDevMiddleware(compiler, {
-        noInfo: true,
-        quiet: false,
         publicPath: config.output.publicPath,
+        stats: { colors: true, chunks: false },
     });
 }
 
-function createHotMiddleware(compiler, config) {
+function createHotMiddleware(compiler) {
     return webpackHotMiddleware(compiler);
 }
 
@@ -72,6 +83,7 @@ function createWatchTask(compiler, callback) {
 module.exports = {
     createBuildTask,
     createConfig,
+    configWithHot,
     createDevMiddleware,
     createHotMiddleware,
     createCompiler,
