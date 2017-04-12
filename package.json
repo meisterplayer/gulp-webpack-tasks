@@ -1,11 +1,11 @@
 {
   "name": "@npm-wearetriple/gulp-webpack-tasks",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Gulp tasks for webpack",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://git.triple-it.nl/javascript/gulp-webpack-tasks.git"
+    "url": "https://github.com/meisterplayer/gulp-webpack-tasks.git"
   },
   "keywords": [
     "gulp",
