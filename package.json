@@ -1,5 +1,5 @@
 {
-  "name": "@npm-wearetriple/gulp-webpack-tasks",
+  "name": "meister-gulp-webpack-tasks",
   "version": "1.0.6",
   "description": "Gulp tasks for webpack",
   "main": "index.js",
