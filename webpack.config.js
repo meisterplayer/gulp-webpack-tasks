@@ -20,7 +20,7 @@ module.exports = {
     module: {
         loaders: [
             {
-                test: /\.(jpe?g|png|gif|svg)$/i,
+                test: /\.(jpe?g|png|gif)$/i,
                 loader: 'url-loader',
                 options: {
                     limit: 100000,
