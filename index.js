@@ -27,6 +27,7 @@ function createConfig(entry, output, minify = false, webpackOptions = {}) {
 
     newWebpackConfig.entry = typeof entry === 'string' ? [entry] : entry;
     newWebpackConfig.output = createOutputConfig(output);
+    newWebpackConfig.output.libraryTarget = webpackOptions.output ? webpackOptions.output.libraryTarget : webpackConfig.output.libraryTarget;
 
     newWebpackConfig.plugins = (minify ? [
         new webpack.optimize.UglifyJsPlugin({
