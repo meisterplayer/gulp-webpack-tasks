@@ -2,40 +2,49 @@ const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 const merge = require('lodash.merge');
-const webpackConfig = require('./webpack.config');
+const createWebpackConfig = require('./lib/create-webpack-config');
 
-function createOutputConfig(outputOptions) {
-    if (typeof outputOptions === 'string') {
-        return merge({}, webpackConfig.output, {
-            filename: outputOptions,
-        });
-    } else {
-        return merge({}, webpackConfig.output, outputOptions);
+// function createConfig(entry, output, minify = false, webpackOptions = {}) {
+//     if (!entry) {
+//         throw new Error('Entry path argument is required');
+//     }
+
+//     if (!output) {
+//         throw new Error('Output path argument is required');
+//     }
+
+//     const newWebpackConfig = merge({}, webpackConfig, webpackOptions);
+
+//     newWebpackConfig.entry = typeof entry === 'string' ? [entry] : entry;
+//     newWebpackConfig.output = createOutputConfig(output);
+//     newWebpackConfig.output.libraryTarget = webpackOptions.output ? webpackOptions.output.libraryTarget : webpackConfig.output.libraryTarget;
+
+//     return newWebpackConfig;
+// }
+
+function createConfig(entry, output, options = {}) {
+    if (typeof entry !== 'string') throw new Error('`entry` argument is required');
+    if (typeof output !== 'string') throw new Error('`Output` argument is required');
+    if (typeof options === 'boolean') {
+        console.warn([
+            '---',
+            'DEPRECATION: minify became an object instead of a boolean',
+            '',
+            '   from',
+            '       createConfig("./entry.js", "./dist/out.js", true);',
+            '   to',
+            '       createConfig("./entry.js", "./dist/out.js", { minify: true });',
+            '---',
+        ].join('\n'));
+        options = { minify: options };
     }
-}
 
-function createConfig(entry, output, minify = false, webpackOptions = {}) {
-    if (!entry) {
-        throw new Error('Entry path argument is required');
-    }
+    const assertRelative = str => /^\..*/.test(str);
 
-    if (!output) {
-        throw new Error('Output path argument is required');
-    }
+    if (!assertRelative(entry)) throw new Error('entry should be relative');
+    if (!assertRelative(output)) throw new Error('output should be relative');
 
-    const newWebpackConfig = merge({}, webpackConfig, webpackOptions);
-
-    newWebpackConfig.entry = typeof entry === 'string' ? [entry] : entry;
-    newWebpackConfig.output = createOutputConfig(output);
-    newWebpackConfig.output.libraryTarget = webpackOptions.output ? webpackOptions.output.libraryTarget : webpackConfig.output.libraryTarget;
-
-    newWebpackConfig.plugins = (minify ? [
-        new webpack.optimize.UglifyJsPlugin({
-            compress: { warnings: false },
-        })
-    ] : []);
-
-    return newWebpackConfig;
+    return createWebpackConfig(entry, output, options);
 }
 
 function configWithHot(config) {
@@ -65,20 +74,32 @@ function createHotMiddleware(compiler) {
     return webpackHotMiddleware(compiler);
 }
 
+const webpackCallback = callback => {
+    let cb = callback;
+
+    return (err, stats) => {
+        if (err) throw new Error(err.message || err);
+
+        console.log(stats.toString({
+            chunks: false,
+            colors: true,
+        }));
+
+        if (typeof cb === 'function') {
+            cb();
+            cb = 'done';
+        }
+    }
+}
+
 function createBuildTask(compiler) {
-    return function webpackBuild(done) {
-        compiler.run((err, stats) => {
-            if (err) throw new Error(err);
-            console.log(stats.toString());
-            done();
-        });
+    return function webpackBuild(callback) {
+        compiler.run(webpackCallback(callback));
     }
 }
 
 function createWatchTask(compiler, callback) {
-    compiler.watch({}, (err, stats) => {
-        callback(err, stats);
-    });
+    compiler.watch({}, webpackCallback(callback));
 }
 
 module.exports = {
