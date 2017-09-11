@@ -1,3 +1,4 @@
+/* eslint-disable */
 const webpack = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
@@ -29,14 +30,21 @@ function createConfig(entry, output, minify = false, webpackOptions = {}) {
     newWebpackConfig.output = createOutputConfig(output);
     newWebpackConfig.output.libraryTarget = webpackOptions.output ? webpackOptions.output.libraryTarget : webpackConfig.output.libraryTarget;
 
-    newWebpackConfig.plugins = (minify ? [
+    newWebpackConfig.plugins = [
         new webpack.optimize.UglifyJsPlugin({
-            compress: { warnings: false },
-        })
-    ] : []);
+            warnings: false,
+            mangle: minify,
+            sourceMap: !minify,
+            output: {
+                comments: !minify,
+                beautify: !minify,
+            },
+        }),
+    ];
 
     return newWebpackConfig;
 }
+
 
 function configWithHot(config) {
     config.entry.unshift('webpack-hot-middleware/client?reload=true');
