@@ -9,7 +9,6 @@ module.exports = (opts = {}) => {
         {
             loader: 'css-loader',
             options: {
-                modules: true,
                 localIdentName: 'mstr-[folder]-[local]',
             },
         },
