@@ -80,7 +80,6 @@ function createBuildTask(compiler) {
     return function webpackBuild(done) {
         compiler.run((err, stats) => {
             if (err) throw new Error(err);
-            console.log(stats.toString());
             done();
         });
     }
