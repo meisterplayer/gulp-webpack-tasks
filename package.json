@@ -1,6 +1,6 @@
 {
   "name": "meister-gulp-webpack-tasks",
-  "version": "1.0.11",
+  "version": "1.0.14",
   "description": "Gulp tasks for webpack",
   "main": "index.js",
   "repository": {
