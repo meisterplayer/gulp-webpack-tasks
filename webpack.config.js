@@ -44,9 +44,9 @@ module.exports = (opts = {}) => {
                 },
                 {
                     test: /\.scss$/,
-                    loaders: opts.cssFilename ? ExtractTextWebpackPlugin.extract({
+                    loaders: opts.cssFilename? ExtractTextWebpackPlugin.extract({
                         use: cssLoaders,
-                    }) : cssLoaders.concat('style-loader?sourceMap'),
+                    }) : ['style-loader?sourceMap'].concat(cssLoaders),
                 },
                 {
                     test: /\.(woff|ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
